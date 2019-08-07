@@ -12,14 +12,12 @@
 			padding: 20;
 			border: none;
 		}
-
 		county-path {
 			stroke: #fff;
 			stroke-width: .5;
 			stroke-dasharray: 1;
 			fill: #afafaf;
 		}
-
 		div.tooltip {
 			background: lightgray;
 			border: 0.5px;
@@ -27,19 +25,15 @@
 			text-align: center;
 			padding: 2px;
 		}
-
 		div {
 			font-family: "Gill Sans"
 		}
-
 		text {
 			font-family: "Gill Sans"
 		}
-
 		span {
 			font-family: "Gill Sans"
 		}
-
 		#controls {
 			height: 100px;
 			width: 400px;
@@ -85,13 +79,11 @@
 	const margin = { top: 0, right: 0, bottom: 0, left: 0 };
 	const mapWidth = width - margin.left - margin.right;
 	const mapHeight = height - margin.top - margin.bottom;
-
 	// if do not want the mouse on and mouse leave events, delete them from the following function.
 	const requestData = async () => {
 		let week = await d3.csv("data/cleaned_restaurant_week_2018_final.csv");
 		let inspection = await d3.csv("data/cleaned_inspection_results.csv");
 		let nyc = await d3.json("data/nyc.geojson")
-
 		//projection, path, svg view
 		var projection = d3.geoConicConformal()
 			.parallels([33, 45])
@@ -99,9 +91,7 @@
 			.translate([(width) / 2 - 1000, (height) / 2]).fitSize([mapWidth, mapHeight], nyc);
 		var path = d3.geoPath().projection(projection);
 		let view = mapSVG.append("g");
-
 		// console.log(week, inspection, nyc);
-
 		//supporting things for viz (tooltip, zoom transform amount, etc.)
 		let tooltip = d3.select("body")
 			.append("div").attr("class", "tooltip").style("opacity", 0);
@@ -109,7 +99,6 @@
 		let circle_stroke = 0.8;
 		let zoom_scale = 1;
 		let stroke_w = .6;
-
 		//counties
 		view.selectAll("path").data(nyc.features)
 			.enter()
@@ -131,18 +120,15 @@
 					.style("stroke", "#fff")
 				popover.html("<br>");
 			});
-
 		// Create color scale and legend
 		let maxViolations = d3.max(d3.values(week), function (d) { return parseInt(d.violations); });
 		const colorScale = d3.scaleQuantile()
 			.domain([1, maxViolations])
 			.range(["#F08080", "#DC143C", "#B22222", "#8B0000"]);
-
 		const legend = d3.select("svg#map")
+			.append("svg").attr("width", 150).attr("height", 250);
 		const legendWidth = legend.attr("width");
 		const legendHeight = legend.attr("height");
-		.append("svg").attr("width", 150).attr("height", 250);
-
 		legend.append("rect")
 			.attr("x", 1)
 			.attr("y", 1)
@@ -151,52 +137,42 @@
 			.style("fill", "white")
 			.style("stroke", "black")
 			.style("stroke-width", "1px");
-
 		legend.append("text")
 			.attr("x", legendWidth * 0.5)
 			.attr("y", 18)
 			.style("text-anchor", "middle")
 			.style("font-size", "20px")
 			.text("Legend");
-
 		legend.append("text")
 			.attr("x", legendWidth * 0.5)
 			.attr("y", 35)
 			.style("text-anchor", "middle")
 			.style("font-size", "10px")
 			.text("Restaurants Without Violations");
-
 		legend.append("circle")
 			.attr("cx", legendWidth * 0.5)
 			.attr("cy", 45)
 			.attr("r", 5)
 			.style("fill", "blue");
-
 		legend.append("text")
 			.attr("x", legendWidth * 0.5)
 			.attr("y", 60)
 			.style("text-anchor", "middle")
 			.style("font-size", "10px")
 			.text("Restaurants With Violations");
-
 		const barHeight = 20;
 		const stepSize = 4;
-
 		const pixelScale = d3.scaleLinear()
 			.domain([legendWidth * 0.2, legendWidth * 0.8])
 			.range([0, maxViolations + 1]);
-
 		const barScale = d3.scaleLinear()
 			.domain([0, maxViolations + 1])
 			.range([legendWidth * 0.2, legendWidth * 0.8]);
-
 		const barAxis = d3.axisBottom(barScale);
-
 		legend.append("g")
 			.attr("class", "colorbar axis")
 			.attr("transform", "translate(" + (0) + "," + (barHeight + 70) + ")")
 			.call(barAxis);
-
 		let bar = legend.append("g").attr("transform", "translate(" + (0) + "," + (70) + ")")
 		for (let i = legendWidth * 0.2; i < legendWidth * 0.8; i = i + stepSize) {
 			bar.append("rect")
@@ -207,8 +183,6 @@
 				.style("fill", colorScale(pixelScale(i))); // pixels => countData => color
 		}
 		// 
-
-
 		//restaurants
 		view.selectAll("circle")
 			.data(week)
@@ -257,7 +231,6 @@
 					const chart = d3.select('#chartSVG');
 					chart.selectAll("*").remove();
 					chart.remove();
-
 					let info = d3.select("#restaurant_holder").append("div")
 						.attr("class", "overflow-auto border pl-2 pt-2")
 						.style("overflow", "auto")
@@ -345,30 +318,22 @@
 						}
 					});
 					window.scrollTo(0, document.body.scrollHeight); //scroll to bottom
-
 					//violation trend chart
 					if (chartData.length > 0) {
 						//parse collected data
-
 						var counts = {};
 						chartData.forEach(function (x) { counts[x] = (counts[x] || 0) + 1; });
-
 						var finalList = [];
 						for (const date of Object.keys(counts)) {
 							finalList.push({ 'date': new Date(date + '-01'), 'value': counts[date], 'crit': crit_data[date] });
 						};
-
-
 						//implement the chart
 						const chartMargin = { left: 40, right: 10, top: 50, bottom: 70 };
 						const chartWidth = 350 - chartMargin.left - chartMargin.right;
 						const chartHeight = 500 - chartMargin.top - chartMargin.bottom;
-
-
 						var chartxScale = d3.scaleTime()
 							.domain(d3.extent(finalList, d => d.date))
 							.range([0, chartWidth]);
-
 						if (d.name == 'Obao') {
 							var chartyScale = d3.scaleLinear().domain([0, 30]).range([chartHeight, 0]);
 						} else if (d.name == 'Il Postino' || d.name == 'Brasserie Cognac') {
@@ -377,11 +342,9 @@
 						else {
 							var chartyScale = d3.scaleLinear().domain([0, 10]).range([chartHeight, 0]);
 						};
-
 						var chartline = d3.line()
 							.x(d => chartxScale(d.date)) // set the x values for the line generator
 							.y(d => chartyScale(d.value)); // set the y values for the line generator
-
 						var chartSVG = d3.select("div#controls").append("svg")
 							.attr("width", 350)
 							.attr("height", 500)
@@ -399,14 +362,12 @@
 							.attr("y", -5)
 							.text(d.name + " Violation Trend Chart")
 							.style("text-anchor", "middle");
-
 						// X axis label   
 						chartSVG.append("text")
 							.attr("x", chartWidth / 2)
 							.attr("y", chartyScale(0) + 65)
 							.style("text-anchor", "middle")
 							.text("Date");
-
 						// Y axis label
 						chartSVG.append("text")
 							.attr("transform", "rotate(-90)")
@@ -415,7 +376,6 @@
 							.attr("dy", "1em")
 							.style("text-anchor", "middle")
 							.text("Number of violations");
-
 						chartSVG.append("g")
 							// .attr("class", "x axis")
 							.attr("transform", "translate(0," + chartHeight + ")")
@@ -425,12 +385,9 @@
 							.attr("dx", "-.8em")
 							.attr("dy", ".15em")
 							.attr("transform", "rotate(-65)");
-
 						chartSVG.append("g")
 							// .attr("class", "y chartyScale")
 							.call(d3.axisLeft(chartyScale));
-
-
 						const chartPath = chartSVG.append("path")
 							.datum(finalList)
 							.attr("class", "line")
@@ -440,17 +397,12 @@
 							.attr("stroke-linejoin", "round")
 							.attr("stroke-linecap", "round")
 							.attr("d", chartline);
-
 						const totalLength = chartPath.node().getTotalLength();
-
 						chartPath.attr("stroke-dasharray", totalLength+" "+totalLength)
 							.attr("stroke-dashoffset", totalLength)
 							.transition()
 								.duration(1000)
 								.attr("stroke-dashoffset", 0);
-
-
-
 						chartSVG.selectAll(".dot")
 							.data(finalList)
 							.enter().append("circle")
@@ -490,25 +442,19 @@
 								if (id.substring(0, 2) === "01") { id = id.substring(0, 2) + (parseInt(id.slice(-4)) + 1); }
 								document.getElementById("month" + id).scrollIntoView();
 							});
-
 					};
 				}
-
 			});
-
 		var zoom = d3.zoom()
 			.scaleExtent([1, 8])
 			.translateExtent([[-50, 50], [mapWidth, mapHeight]])
 			.on("zoom", zoomed);
-
 		view.call(zoom);
 		view.call(zoom.transform, d3.zoomIdentity.translate(-380, -300).scale(3));
-
 		function zoomed() {
 			let transform = d3.event.transform;
 			zoom_scale = transform.k;
 			view.attr("transform", transform.toString()); //drag and zoom
-
 			view.selectAll("circle")
 				.attr("r", function () {
 					circle_r = 3 / zoom_scale;
@@ -524,9 +470,7 @@
 					return stroke_w;
 				})
 		}
-
 		var appliedFilters = {};
-
 		function applyFilters(d) {
 			let meetsCriteria = true;
 			d3.values(appliedFilters).forEach(filter => {
@@ -534,26 +478,19 @@
 			});
 			return meetsCriteria;
 		}
-
 		function updateAppliedFilters() {
 			mapSVG.selectAll("circle")
 				.data(week)
 				.style("opacity", d => (applyFilters(d)) ? 1.0 : 0.0)
 		}
-
 		updateAppliedFilters();
-
 		function makeSlider(property) {
 			let values = week.map(d => d[property]);
-
 			let maxViolations = d3.max(d3.values(week), function (d) { return parseInt(d.violations); });
-
 			let sliderWidth = parseFloat(d3.select("div#controls").style("width"));
 			let sliderHeight = 75;
-
 			let xScale = d3.scaleLinear().domain([0, maxViolations]).range([10, sliderWidth - 10]);
 			let xAxis = d3.axisBottom(xScale).tickFormat(d3.format(".2s"));
-
 			let container = d3.select("div#controls").append("div").attr("class", "control");
 			let label = container.append("div").text("Violations Slider");
 			let canvas = container.append("svg")
@@ -565,64 +502,44 @@
 			let axisLayer = canvas.append("g")
 				.attr("transform", "translate(" + 0 + "," + (sliderHeight - 18) + ")")
 				.call(xAxis);
-
 			let numBins = 10;
 			let counts = d3.histogram().domain([0, maxViolations]).thresholds(numBins)(values);
-
 			let yScale = d3.scaleLinear().domain(d3.extent(counts, d => d.length))
 				.range([sliderHeight - 18, 5]);
-
 			counts.forEach(d => {
 				d.xM = (d.x0 + d.x1) / 2.0; // compute midpoints
 			});
-
 			counts.unshift({ xM: counts[0].x0, length: counts[0].length });
 			counts.push({ xM: counts[counts.length - 1].x1, length: counts[counts.length - 1].length });
-
 			let area = d3.area().x(d => xScale(d.xM))
 				.y0(yScale(0))
 				.y1(d => yScale(d.length))
 				.curve(d3.curveNatural);
-
 			histoLayer.append("path").datum(counts)
 				.attr("class", "area")
 				.attr("d", area)
 				.attr("fill", "gray");
-
 			var brush = d3.brushX()
 				.extent([[10, 0], [sliderWidth - 10, sliderHeight - 18]])
 				.on("brush end", brushMoved);
-
 			function brushMoved() {
-
 				if (d3.event.selection !== null) {
-
 					let start = xScale.invert(d3.event.selection[0]);
 					let end = xScale.invert(d3.event.selection[1]);
-
 					let newFilter = d => d[property] >= start && d[property] <= end;
 					appliedFilters[property] = newFilter;
 				}
-
 				else {
-
 					let newFilter = function () { return true; }
 					appliedFilters[property] = newFilter;
-
 				}
-
 				updateAppliedFilters();
 			}
-
 			canvas.append("g").attr("class", "brush")
 				.call(brush);
 		}
-
 		makeSlider("violations");
-
 	}
-
 	requestData();
 </script>
-
 </html>
